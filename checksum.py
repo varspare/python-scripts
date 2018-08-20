@@ -1,13 +1,12 @@
 #!/usr/bin/env python3
 ##############################
 # Author Mark Davison
-# Last revision 2018/08/18
+# Last revision 2018/08/20
 ##############################
 """Checksum
 
 Usage:
-  checksum.py <file> [-c <checksum>] [-t <type>]
-  checksum.py -f <file> [-c <checksum>] [-t <type>]
+  checksum.py -f <file> [-c <checksum>] [-t <hash_type>]
   checksum.py (-h | --help)
   checksum.py (-v | --version)
 
@@ -23,13 +22,11 @@ from docopt import docopt
 import hashlib
 import sys
 
-def getChecksum():
-    print('Inside getChecksum')
-
-def verifyChecksum(checksum):
-    print('inside verifyChecksum')
+def verifyChecksum(checksum, hType):
     length = len(checksum)
-    if (length == 64):
+    if (hType != 'None'):
+        htype = hType
+    elif (length == 64):
         htype = 'sha256'
     elif (length == 40):
         htype = 'sha1'
@@ -46,14 +43,14 @@ def verifyChecksum(checksum):
     return(htype)
 
 def compareSums(f, checksum, htype):
-    print('inside compareSums')
     try:
         hasher = hashlib.new(htype)
         content = f.read()
         hasher.update(content)
         generatedHash = hasher.hexdigest()
-    except:
-        print('Hashing failed: ', file)
+        print(generatedHash)
+    except Exception as e:
+        print('Hashing failed for ', file, ',', e)
         die(256)
     print('checksum       ' + checksum)
     print ('generatedHash: ' + generatedHash)
@@ -69,7 +66,10 @@ def die(code):
 
 if __name__ == '__main__':
     arguments = docopt(__doc__, version='checksum 0.0.1')
-    print(arguments)
+    if (arguments.get('--type')):
+        hType = arguments.get("<hash_type>")
+    else:
+        hType = 'None'
 
     if (arguments.get('--file')):
         file = arguments.get("<file>")
@@ -81,10 +81,10 @@ if __name__ == '__main__':
 
     if (arguments.get('--checksum')):
         checksum = arguments.get('--checksum')
-        hashType = verifyChecksum(checksum)
+        hashType = verifyChecksum(checksum, hType)
     else:
         checksum = input('Please enter your expected checksum: ')
-        hashType = verifyChecksum(checksum)
+        hashType = verifyChecksum(checksum, hType)
 
     result = compareSums(f, checksum, hashType)
 
@@ -93,5 +93,4 @@ if __name__ == '__main__':
     else:
         print('Fail')
     die(result)
-
 
