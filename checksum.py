@@ -53,7 +53,7 @@ def compareSums(f, checksum, htype):
         print('Hashing failed for ', file, ',', e)
         die(256)
     print('checksum       ' + checksum)
-    print ('generatedHash: ' + generatedHash)
+    print('generatedHash: ' + generatedHash)
     if (checksum == generatedHash):
         result = 0
     else:
@@ -87,6 +87,8 @@ if __name__ == '__main__':
         hashType = verifyChecksum(checksum, hType)
 
     result = compareSums(f, checksum, hashType)
+
+    print("Hash type is: " + hashType)
 
     if (result == 0):
         print('Match')
